@@ -7,6 +7,7 @@ import Hero from './components/Hero.vue'
 import PromoBanner from './components/PromoBanner.vue'
 import CategoryCard from './components/CategoryCard.vue'
 import ProductCard from './components/ProductCard.vue'
+import ProductDetailModal from './components/ProductDetailModal.vue'
 import CartDrawer from './components/CartDrawer.vue'
 import HowToBuy from './components/HowToBuy.vue'
 import TrustSection from './components/TrustSection.vue'
@@ -19,6 +20,8 @@ import { CATEGORIES, PRODUCTS } from './data/products'
 const cart = ref([])
 const isCartOpen = ref(false)
 const selectedCategory = ref('todos') // Default filters showing 'todos'
+const selectedProductForDetail = ref(null)
+const isDetailOpen = ref(false)
 
 // Calculate total items in the cart
 const totalCartCount = computed(() => {
@@ -50,15 +53,29 @@ const selectCategory = (categoryId) => {
 }
 
 // Cart operations
-const addToCart = (product) => {
+const addToCart = (productOrPayload) => {
+  let product = productOrPayload
+  let quantityToAdd = 1
+
+  // Handle payload from ProductDetailModal: { product, quantity }
+  if (productOrPayload && productOrPayload.product && productOrPayload.quantity !== undefined) {
+    product = productOrPayload.product
+    quantityToAdd = productOrPayload.quantity
+  }
+
   const existingItemIndex = cart.value.findIndex(item => item.product.id === product.id)
   if (existingItemIndex > -1) {
-    cart.value[existingItemIndex].quantity += 1
+    cart.value[existingItemIndex].quantity += quantityToAdd
   } else {
-    cart.value.push({ product, quantity: 1 })
+    cart.value.push({ product, quantity: quantityToAdd })
   }
   // Open the cart drawer automatically to give instant feedback
   isCartOpen.value = true
+}
+
+const openProductDetail = (product) => {
+  selectedProductForDetail.value = product
+  isDetailOpen.value = true
 }
 
 const updateQuantity = ({ productId, quantity }) => {
@@ -180,6 +197,7 @@ const clearCart = () => {
               <ProductCard 
                 :product="product"
                 @add-to-cart="addToCart"
+                @view-details="openProductDetail"
               />
             </div>
           </transition-group>
@@ -205,6 +223,14 @@ const clearCart = () => {
       @update-quantity="updateQuantity"
       @remove-item="removeItem"
       @clear-cart="clearCart"
+    />
+
+    <!-- Graphical Product Detail Modal -->
+    <ProductDetailModal
+      :isOpen="isDetailOpen"
+      :product="selectedProductForDetail"
+      @close="isDetailOpen = false"
+      @add-to-cart="addToCart"
     />
 
   </div>

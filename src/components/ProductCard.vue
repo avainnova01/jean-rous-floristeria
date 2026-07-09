@@ -12,7 +12,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['add-to-cart'])
+const emit = defineEmits(['add-to-cart', 'view-details'])
 
 // Format price as "Desde $XX.000"
 const formattedPrice = computed(() => {
@@ -33,7 +33,10 @@ const whatsappQueryUrl = computed(() => {
   <div class="group bg-white rounded-[2rem] border border-beige hover:border-peach overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full hover:-translate-y-1">
     
     <!-- Image Area -->
-    <div class="relative pt-[100%] overflow-hidden bg-stone-100">
+    <div 
+      @click="emit('view-details', product)"
+      class="relative pt-[100%] overflow-hidden bg-stone-100 cursor-pointer"
+    >
       <img 
         :src="product.image" 
         :alt="product.name" 
@@ -51,7 +54,10 @@ const whatsappQueryUrl = computed(() => {
 
     <!-- Details -->
     <div class="p-6 flex flex-col flex-grow">
-      <h4 class="font-serif text-lg font-bold text-stone-900 line-clamp-1 mb-1 group-hover:text-terracotta transition-colors">
+      <h4 
+        @click="emit('view-details', product)"
+        class="font-serif text-lg font-bold text-stone-900 line-clamp-1 mb-1 group-hover:text-terracotta transition-colors cursor-pointer"
+      >
         {{ product.name }}
       </h4>
       
