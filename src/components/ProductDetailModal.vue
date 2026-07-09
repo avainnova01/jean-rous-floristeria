@@ -162,16 +162,16 @@ Categoría: *${categoryDisplayName.value}*
             </div>
 
             <!-- Right Column: Product E-commerce details -->
-            <div class="md:col-span-7 flex flex-col justify-between space-y-6">
+            <div class="md:col-span-7 flex flex-col justify-start space-y-6">
               
-              <!-- Breadcrumbs -->
+              <!-- Breadcrumbs, Name, Description -->
               <div>
-                <nav class="flex flex-wrap items-center gap-1.5 text-xs text-stone-500 font-light mb-4">
-                  <span class="hover:text-terracotta transition-colors">Inicio</span>
+                <nav class="flex flex-wrap items-center gap-1.5 text-xs text-stone-500 font-light mb-3">
+                  <span class="hover:text-terracotta transition-colors cursor-pointer">Inicio</span>
                   <span class="text-stone-300">/</span>
-                  <span class="hover:text-terracotta transition-colors">Ramos de Flores</span>
+                  <span class="hover:text-terracotta transition-colors cursor-pointer">Ramos de Flores</span>
                   <span class="text-stone-300">/</span>
-                  <span class="bg-peach-light/60 text-terracotta border border-peach/30 px-2.5 py-0.5 rounded-full font-semibold text-[9px] uppercase tracking-wider">
+                  <span class="bg-peach-light text-terracotta px-2.5 py-0.5 rounded-full font-semibold text-[9px] uppercase tracking-wider">
                     {{ categoryDisplayName }}
                   </span>
                   <span class="text-stone-300">/</span>
@@ -179,76 +179,101 @@ Categoría: *${categoryDisplayName.value}*
                 </nav>
 
                 <!-- Product Name -->
-                <h2 class="font-serif text-2xl sm:text-3.5xl font-bold text-stone-900 leading-tight mb-3">
+                <h2 class="font-serif text-2xl sm:text-3.5xl font-bold text-stone-900 leading-tight mb-2.5">
                   {{ product.name }}
                 </h2>
 
                 <!-- Description -->
-                <p class="text-stone-600 text-sm sm:text-base font-light leading-relaxed mb-6">
+                <p class="text-stone-600 text-sm sm:text-base font-light leading-relaxed">
                   {{ product.description }}
                 </p>
               </div>
 
-              <!-- Price & Quantity & Actions Area -->
-              <div class="space-y-6 border-t border-beige/60 pt-6">
-                <!-- Price Display -->
-                <div class="flex items-baseline space-x-2">
-                  <span class="text-xs text-stone-400 font-bold uppercase tracking-wider">Precio:</span>
-                  <span class="text-2xl sm:text-3xl font-serif font-bold text-terracotta">
-                    Desde {{ formattedPrice }}
-                  </span>
+              <!-- Purchase Box (Ficha de Compra) -->
+              <div class="bg-white rounded-3xl p-5 border border-beige shadow-xs w-full max-w-[480px] flex flex-col gap-4">
+                
+                <!-- Box Header: Price and SKU -->
+                <div class="flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <span class="text-[9px] text-stone-400 uppercase tracking-widest font-bold">Precio del Arreglo</span>
+                    <span class="text-2xl font-serif font-bold text-terracotta mt-0.5">
+                      Desde {{ formattedPrice }}
+                    </span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[9px] text-stone-400 uppercase tracking-widest font-bold block">Referencia</span>
+                    <span class="text-xs font-mono font-semibold text-stone-600 uppercase tracking-wider block mt-0.5">
+                      {{ productSku }}
+                    </span>
+                  </div>
                 </div>
 
-                <!-- Actions Stack -->
-                <div class="space-y-3">
-                  <!-- Row 1: Quantity and Agregar al Pedido -->
-                  <div class="flex flex-col sm:flex-row gap-3">
-                    <!-- Quantity Selector -->
-                    <div class="flex items-center justify-between sm:justify-start border border-beige rounded-full bg-white px-3 py-2 shadow-xs sm:w-auto">
+                <hr class="border-beige/50" />
+
+                <!-- Box Options: Quantity and Add to Cart -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <!-- Quantity -->
+                  <div class="flex flex-col gap-1.5">
+                    <span class="text-[9px] text-stone-400 uppercase tracking-widest font-bold">Cantidad</span>
+                    <div class="flex items-center justify-between border border-beige rounded-full bg-white px-2.5 py-1.5 shadow-2xs h-[42px] w-full sm:w-[110px]">
                       <button 
                         @click="decrement"
-                        class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-beige/40 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-lg font-bold"
+                        class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-beige/40 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-base font-bold focus:outline-none"
                         :disabled="quantity <= 1"
                       >
                         -
                       </button>
-                      <span class="text-sm font-semibold text-stone-800 w-10 text-center select-none">{{ quantity }}</span>
+                      <span class="text-sm font-semibold text-stone-800 w-8 text-center select-none">{{ quantity }}</span>
                       <button 
                         @click="increment"
-                        class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-beige/40 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-lg font-bold"
+                        class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-beige/40 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer text-base font-bold focus:outline-none"
                       >
                         +
                       </button>
                     </div>
+                  </div>
 
-                    <!-- "Agregar al pedido" Button -->
+                  <!-- Add to Cart Button -->
+                  <div class="flex-grow flex flex-col justify-end">
                     <button 
                       @click="handleAddToCart"
-                      class="flex-1 py-3.5 px-6 rounded-full bg-terracotta hover:bg-terracotta-dark text-white font-bold uppercase tracking-wider text-xs shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer focus:outline-none"
+                      class="w-full h-[42px] rounded-full bg-terracotta hover:bg-terracotta-dark text-white font-bold uppercase tracking-wider text-[11px] shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer focus:outline-none"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       Agregar al pedido
                     </button>
                   </div>
-
-                  <!-- Row 2: WhatsApp Link Button -->
-                  <a 
-                    :href="whatsappUrl"
-                    target="_blank"
-                    class="w-full flex items-center justify-center py-3.5 px-6 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold uppercase tracking-wider text-xs shadow-md hover:shadow-lg transition-all duration-300 gap-2 cursor-pointer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.08-4.149c1.661.989 3.29 1.487 4.909 1.488 5.485-.002 9.945-4.461 9.949-9.947.002-2.657-1.03-5.155-2.906-7.033C16.314 2.483 13.82 1.45 11.168 1.45c-5.485 0-9.946 4.46-9.95 9.948-.002 1.93.504 3.633 1.47 5.267l-.999 3.649 3.737-.981zm13.16-5.14c-.33-.165-1.951-.963-2.251-1.072-.3-.11-.52-.165-.74.165-.22.33-.85 1.072-1.04 1.29-.19.22-.38.24-.71.075-.33-.165-1.393-.513-2.653-1.637-.98-.874-1.64-1.953-1.832-2.28-.19-.33-.02-.507.144-.672.15-.148.33-.385.496-.578.165-.19.22-.33.33-.55.11-.22.05-.412-.025-.578-.075-.165-.74-1.782-1.012-2.44-.267-.643-.539-.556-.74-.566-.19-.01-.41-.01-.63-.01-.22 0-.58.08-.88.41-.3.33-1.15 1.127-1.15 2.75 0 1.62 1.18 3.19 1.34 3.41.165.22 2.328 3.555 5.637 4.98.787.34 1.4.54 1.88.697.79.25 1.51.215 2.08.13.634-.09 1.951-.798 2.227-1.57.275-.77.275-1.43.193-1.57-.083-.14-.303-.225-.634-.39z"/>
-                    </svg>
-                    Consultar disponibilidad por WhatsApp
-                  </a>
                 </div>
 
-                <!-- SKU Code -->
-                <div class="text-[11px] text-stone-500 font-mono pt-2">
-                  SKU: <span class="font-semibold text-stone-700">{{ productSku }}</span>
+                <!-- WhatsApp Consultation Button -->
+                <a 
+                  :href="whatsappUrl"
+                  target="_blank"
+                  class="w-full h-[46px] flex items-center justify-center rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold uppercase tracking-wider text-[11px] shadow-sm hover:shadow transition-all duration-300 gap-2 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.08-4.149c1.661.989 3.29 1.487 4.909 1.488 5.485-.002 9.945-4.461 9.949-9.947.002-2.657-1.03-5.155-2.906-7.033C16.314 2.483 13.82 1.45 11.168 1.45c-5.485 0-9.946 4.46-9.95 9.948-.002 1.93.504 3.633 1.47 5.267l-.999 3.649 3.737-.981zm13.16-5.14c-.33-.165-1.951-.963-2.251-1.072-.3-.11-.52-.165-.74.165-.22.33-.85 1.072-1.04 1.29-.19.22-.38.24-.71.075-.33-.165-1.393-.513-2.653-1.637-.98-.874-1.64-1.953-1.832-2.28-.19-.33-.02-.507.144-.672.15-.148.33-.385.496-.578.165-.19.22-.33.33-.55.11-.22.05-.412-.025-.578-.075-.165-.74-1.782-1.012-2.44-.267-.643-.539-.556-.74-.566-.19-.01-.41-.01-.63-.01-.22 0-.58.08-.88.41-.3.33-1.15 1.127-1.15 2.75 0 1.62 1.18 3.19 1.34 3.41.165.22 2.328 3.555 5.637 4.98.787.34 1.4.54 1.88.697.79.25 1.51.215 2.08.13.634-.09 1.951-.798 2.227-1.57.275-.77.275-1.43.193-1.57-.083-.14-.303-.225-.634-.39z"/>
+                  </svg>
+                  Consultar disponibilidad por WhatsApp
+                </a>
+
+                <!-- Trust Badges Footer inside card -->
+                <div class="flex items-center justify-between text-[10px] text-stone-500 font-medium pt-3.5 border-t border-dashed border-beige">
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-olive mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                    </svg>
+                    Flores 100% Frescas
+                  </span>
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-olive mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 16h6m-6 0H7m12 0v-5.281a1 1 0 00-.312-.707l-4.477-4.477a1 1 0 00-.707-.312H13m6 10.781H13" />
+                    </svg>
+                    Envíos en Cali
+                  </span>
                 </div>
               </div>
             </div>
