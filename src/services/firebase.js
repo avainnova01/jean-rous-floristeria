@@ -20,13 +20,7 @@ import {
   where,
   writeBatch
 } from 'firebase/firestore'
-import { 
-  getStorage, 
-  ref as storageRef, 
-  uploadBytes, 
-  getDownloadURL,
-  deleteObject
-} from 'firebase/storage'
+// Firebase Storage is not used — images are hosted via imgbb (free)
 
 // Firebase config from Vite environment variables
 const firebaseConfig = {
@@ -42,14 +36,8 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
 const auth = getAuth(app)
 const db = getFirestore(app)
-let storage
-try {
-  storage = getStorage(app)
-} catch (e) {
-  console.warn("Firebase Storage could not be initialized. Check bucket configuration.", e)
-}
 
-export { auth, db, storage }
+export { auth, db }
 
 // --- AUTHENTICATION SERVICES ---
 
@@ -65,31 +53,39 @@ export const observeAuthState = (callback) => {
   return onAuthStateChanged(auth, callback)
 }
 
-// --- IMAGES STORAGE SERVICES ---
+// --- IMAGES: Upload to imgbb (free, no Firebase Storage needed) ---
+// Get your free API key at: https://api.imgbb.com/
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY || ''
 
-export const uploadImage = async (file, path = 'uploads') => {
-  if (!storage) {
-    throw new Error('Firebase Storage is not initialized.')
+export const uploadImage = async (file) => {
+  if (!IMGBB_API_KEY) {
+    throw new Error('Falta la API key de imgbb. Agrega VITE_IMGBB_API_KEY en tu archivo .env')
   }
-  const fileExtension = file.name.split('.').pop()
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`
-  const fileRef = storageRef(storage, `${path}/${fileName}`)
-  
-  const snapshot = await uploadBytes(fileRef, file)
-  return getDownloadURL(snapshot.ref)
-}
 
-export const deleteImage = async (fileUrl) => {
-  if (!storage || !fileUrl) return
-  try {
-    // Only attempt delete if it is a storage URL
-    if (fileUrl.includes('firebasestorage.googleapis.com')) {
-      const fileRef = storageRef(storage, fileUrl)
-      await deleteObject(fileRef)
-    }
-  } catch (error) {
-    console.error('Error deleting image from Storage:', error)
+  // Convert file to base64
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result.split(',')[1]) // strip "data:image/...;base64,"
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+
+  const formData = new FormData()
+  formData.append('key', IMGBB_API_KEY)
+  formData.append('image', base64)
+
+  const response = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: formData
+  })
+
+  const result = await response.json()
+
+  if (!result.success) {
+    throw new Error(result.error?.message || 'Error al subir la imagen a imgbb')
   }
+
+  return result.data.url // direct image URL
 }
 
 // --- GENERAL SETTINGS SERVICES ---
@@ -116,14 +112,15 @@ export const saveGeneralSettings = async (settings) => {
 export const fetchCategories = async (onlyActive = false) => {
   try {
     const categoriesCol = collection(db, 'categories')
-    let q = query(categoriesCol, orderBy('order', 'asc'))
-    
-    if (onlyActive) {
-      q = query(categoriesCol, where('active', '==', true), orderBy('order', 'asc'))
-    }
-    
+    // Use simple orderBy to avoid needing a composite index
+    const q = query(categoriesCol, orderBy('order', 'asc'))
     const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    // Filter active client-side if requested
+    if (onlyActive) {
+      results = results.filter(cat => cat.active !== false)
+    }
+    return results
   } catch (error) {
     console.error('Error fetching categories from Firestore:', error)
     throw error
@@ -147,14 +144,15 @@ export const removeCategory = async (id) => {
 export const fetchProducts = async (onlyActive = false) => {
   try {
     const productsCol = collection(db, 'products')
-    let q = query(productsCol, orderBy('order', 'asc'))
-    
-    if (onlyActive) {
-      q = query(productsCol, where('active', '==', true), orderBy('order', 'asc'))
-    }
-    
+    // Use simple orderBy to avoid needing a composite index
+    const q = query(productsCol, orderBy('order', 'asc'))
     const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    // Filter active client-side if requested
+    if (onlyActive) {
+      results = results.filter(prod => prod.active !== false)
+    }
+    return results
   } catch (error) {
     console.error('Error fetching products from Firestore:', error)
     throw error
@@ -215,7 +213,7 @@ export const seedDatabase = async (categories, products) => {
   // 3. Seed general settings
   const settingsRef = doc(db, 'settings', 'general')
   batch.set(settingsRef, {
-    whatsappNumber: '573000000000',
+    whatsappNumber: '573173499781',
     siteName: 'Jean Rous Floristería'
   }, { merge: true })
 

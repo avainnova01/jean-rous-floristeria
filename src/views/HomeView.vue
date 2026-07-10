@@ -150,7 +150,7 @@ const clearCart = () => {
     <Header :cartCount="totalCartCount" @open-cart="isCartOpen = true" />
 
     <!-- Hero Showcase Section -->
-    <Hero @scroll-to-catalog="scrollToId('categorias')" />
+    <Hero :whatsappNumber="whatsappNumber" @scroll-to-catalog="scrollToId('categorias')" />
 
     <!-- Promotional Custom Ribbon -->
     <PromoBanner />

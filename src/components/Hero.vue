@@ -1,4 +1,11 @@
 <script setup>
+const props = defineProps({
+  whatsappNumber: {
+    type: String,
+    default: '573000000000'
+  }
+})
+
 defineEmits(['scroll-to-catalog'])
 </script>
 
@@ -47,8 +54,8 @@ defineEmits(['scroll-to-catalog'])
             >
               Ver catálogo
             </button>
-            <a 
-              href="https://wa.me/573000000000?text=Hola%20Jean%20Rous%20Florister%C3%ADa,%20me%20gustar%C3%ADa%20solicitar%20un%20arreglo%20personalizado."
+             <a 
+              :href="'https://wa.me/' + whatsappNumber + '?text=Hola%20Jean%20Rous%20Florister%C3%ADa,%20me%20gustar%C3%ADa%20solicitar%20un%20arreglo%20personalizado.'"
               target="_blank"
               class="mt-3 sm:mt-0 w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 border border-gold/60 text-base font-semibold rounded-full text-stone-800 bg-white/70 hover:bg-white hover:border-gold shadow-sm hover:shadow transition-all duration-300 hover:-translate-y-0.5"
             >
