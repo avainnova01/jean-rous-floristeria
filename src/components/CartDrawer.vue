@@ -9,13 +9,14 @@ const props = defineProps({
   cartItems: {
     type: Array,
     required: true
+  },
+  whatsappNumber: {
+    type: String,
+    default: '573000000000'
   }
 })
 
 const emit = defineEmits(['close', 'update-quantity', 'remove-item', 'clear-cart'])
-
-// Configuration Number
-const WHATSAPP_NUMBER = "573000000000" // Cambiar aquí el número de la floristería (Código país + número sin espacios)
 
 // Form fields
 const clientName = ref('')
@@ -104,7 +105,7 @@ ${specialNotes.value ? specialNotes.value : 'Ninguna.'}
 ---
 Quedo atento(a) para confirmar disponibilidad, valor final y forma de pago. ✨`
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+  const whatsappUrl = `https://wa.me/${props.whatsappNumber}?text=${encodeURIComponent(message)}`
   
   // Open WhatsApp in new tab
   window.open(whatsappUrl, '_blank')
